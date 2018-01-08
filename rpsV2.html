@@ -1,18 +1,61 @@
-<script>
-    let playerSelection = "rock";
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="utf-8">
+    <title>Rock Paper Scissors</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+<div id="mainContent">
+    <div id="buttons">
+        <button id="rock" class="btn">Rock</button>
+        <button id="paper" class="btn">Paper</button>
+        <button id="scissors" class="btn">Scissors</button>
+    </div>
+    <div class="winner"></div>
+    <div class="score"></div>
+    <div class="final-score"></div>
+</div>
+<script> 
+    let playerSelection;
     let computerSelection = computerPlay();
+    let roundResult;
+    const btns = document.querySelectorAll('.btn');
+    let para = document.createElement('p');
+    let paraScore = document.createElement('p');
+    let paraFinalScore = document.createElement('p');
+    const winner = document.querySelector('.winner');
+    const score = document.querySelector('.score');
+    const finalScore = document.querySelector('.final-score');
+    
+    // object for round result and count of wins
+    let scoreRound = new Object();
+    scoreRound.str = "";
+    scoreRound.player = 0,
+    scoreRound.comp = 0;
+    
+    btns.forEach(btn => btn.addEventListener('click', selectBtn));
+    function selectBtn(btn){
+        playerSelection = btn.target.id;
+        randomAgain(playerSelection, computerSelection);
+        roundResult = verifyWinner(playerSelection, computerSelection);
+        
+        keepScore(verifyWinner);
+    }
     
     // randoms a play for computer
     function computerPlay(){
         let result = random3();
         if (result === 0){
-            return "rock";
+            return 'rock';
         }
         else if(result === 1){
-            return "paper";
+            return 'paper';
         }
         else {
-            return "scissors";
+            return 'scissors';
         }
     }
     
@@ -21,77 +64,100 @@
         return Math.floor((Math.random() * 3));
     }
     
-    function makeSmallCase(playerString){
-        playerSelection = playerString.toLowerCase();
-    }
-    
-    // changes player string to lower case
-    makeSmallCase(playerSelection);
-    
-    
     // checks winner and returns a string
-    function playRound(playerSelection, computerSelection) {
-
-	    if ((computerSelection === "rock") && (playerSelection === "scissors")){
-	        return "You Lose! Rock beats Scissors.";
+    function verifyWinner(playerSelection, computerSelection){
+        computerSelection = computerPlay();
+        
+	    if ((computerSelection === 'rock') && (playerSelection === 'scissors')){
+	        para.textContent = 'You Lose! The computer played Rock.';
+	        winner.appendChild(para);
+	        return 'lose';
 	    }
-	    else if ((computerSelection === "scissors") && (playerSelection === "rock")){
-	        return "You Win! Rock beats Scissors.";
+	    else if ((computerSelection === 'scissors') && (playerSelection === 'rock')){
+	        para.textContent = 'You Win! The computer played Scissors.';
+	        winner.appendChild(para);
+	        return 'win';
 	    }
-	    else if ((computerSelection === "paper") && (playerSelection === "rock")){
-	        return "You Lose! Paper beats Rock.";
+	    else if ((computerSelection === 'paper') && (playerSelection === 'rock')){
+	        para.textContent = 'You Lose! The computer played Paper.';
+	        winner.appendChild(para);
+	        return 'lose';
 	    }
-	    else if ((computerSelection === "rock") && (playerSelection === "paper")){
-	        return "You Win! Paper beats Scissors.";
+	    else if ((computerSelection === 'rock') && (playerSelection === 'paper')){
+	        para.textContent = 'You Win! The computer played Rock.';
+	        winner.appendChild(para);
+	        return 'win';
 	    }
-	    else if ((computerSelection === "scissors") && (playerSelection === "paper")){
-	        return "You Lose! Scissors beats Paper.";
+	    else if ((computerSelection === 'scissors') && (playerSelection === 'paper')){
+	        para.textContent = 'You Lose! The computer played Scissors.';
+	        winner.appendChild(para);
+	        return 'lose';
 	    }
-	    else if ((computerSelection === "paper") && (playerSelection === "scissors")){
-	        return "You Win! Scissors beats Paper.";
+	    else if ((computerSelection === 'paper') && (playerSelection === 'scissors')){
+	        para.textContent = 'You Win! The computer played Paper.';
+	        winner.appendChild(para);
+	        return 'win';
 	    }
         else {
-            return "It's a Draw.";
+            para.textContent = 'It\'s a Draw.';
+            winner.appendChild(para);
+            return 'draw';
         }
     }
     
-    // plays 5 rounds of rock paper scissors
-    function game(playRound){
-        
-        // object for round result and count of wins
-        let scoreRound = new Object();
-        scoreRound.str = "";
-        scoreRound.player = 0,
-        scoreRound.comp = 0;
-        
-        // 5 rounds
-        for (let x = 0; x < 5; x++){
-            
-            // stores player input
-            let play = prompt("What will you play? Rock, Paper, Scissors");
-            
-            // new play for computer
-            let computerSelection = computerPlay();
-            
-            // plays 1 round and stores winner string
-            let resultRound = playRound(play, computerSelection);
-            scoreRound.str = resultRound;
-            
-            // counts player and computer score
-            if (scoreRound.str.includes("Win")){
-                scoreRound.player++;
-                console.log(scoreRound.player);
+    // if score 5:5 computer plays again
+    function randomAgain(playerS, computerS){
+        if ((scoreRound.player >= 5) && (scoreRound.comp >= 5)){
+            while (playerS === computerS){
+                computerSelection = computerPlay();
             }
-            else if (scoreRound.str.includes("Lose")){
-                scoreRound.comp++;
-                console.log(scoreRound.comp);
-            }
-            // declare round winner
-            console.log(scoreRound.str + " The score is " + scoreRound.player + " for player and " + scoreRound.comp + " for Computer.");
         }
-        console.log("Final score is Player " + scoreRound.player + " : " + scoreRound.comp + " Computer");
+    }
+    
+    // plays rounds of RPS until one score reaches 5
+    function keepScore(playRound){
+        // new play for computer
+        computerSelection = computerPlay();
+        
+        // empties final score string
+        paraFinalScore.textContent = '';
+        
+        // counts player and computer score
+        if (roundResult === 'win'){
+            ++scoreRound.player;
+            paraScore.textContent = `Player ${scoreRound.player} : ${scoreRound.comp} Computer`;
+            score.appendChild(paraScore);
+        }
+        else if (roundResult === 'lose'){
+            ++scoreRound.comp;
+            paraScore.textContent = `Player ${scoreRound.player} : ${scoreRound.comp} Computer`;
+            score.appendChild(paraScore);
+        }
+        else {
+            ++scoreRound.player;
+            ++scoreRound.comp;
+            paraScore.textContent = `Player ${scoreRound.player} : ${scoreRound.comp} Computer`;
+            score.appendChild(paraScore);
+        }
+
+        // if one score reaches 5 reset object
+        if ((scoreRound.player == 5) || (scoreRound.comp == 5)){
+            if (scoreRound.player == 5){
+                paraFinalScore.textContent = 'The Player won the match.';
+                finalScore.appendChild(paraFinalScore);
+            }
+            else if (scoreRound.comp == 5){
+                paraFinalScore.textContent = 'The Computer won the match.';
+                finalScore.appendChild(paraFinalScore);
+            }
+            
+            scoreRound = new Object();
+            scoreRound.player = 0,
+            scoreRound.comp = 0;
+        }
     }
 
-    //console.log(playRound(playerSelection, computerSelection));
-    console.log(game(playRound));
 </script>
+
+</body>
+</html>
